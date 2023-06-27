@@ -1,0 +1,42 @@
+import mensajeros.*
+
+describe "test primera parte" {
+	
+	test "roberto puede llevar un paquete pago en un camion con un acoplado" {
+		paquete.pagar()
+		camion.acoplados(1)
+		assert.that(paquete.puedeSerEntregadoPor(roberto))
+	}
+	
+	test "neo con credito no puede llevar un paquete que no esta pago a la matrix" {
+		paquete.destino(matrix)
+		assert.notThat(paquete.puedeSerEntregadoPor(neo))
+	}
+}
+
+describe "segunda parte" {
+	
+	test "contratar a roberto: lo agrega a la lista" {
+		
+	}
+	
+	test "despedir un a neo: lo saca de la lista" {
+		
+	}
+	
+	test "despedir a todos los mensajeros: vacía la lista" {
+		
+	}
+	
+	test "la mensajería no es grande porque solo contrato a neo" {
+				
+	}
+	
+	test "roberto es el primer empleado y no puede llevar el paquete porque pesa mucho {
+		
+	}
+	
+	test "neo fue contratado ultimo y pesa cero" {
+		
+	}
+}

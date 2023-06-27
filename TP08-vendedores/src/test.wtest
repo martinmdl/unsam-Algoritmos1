@@ -1,0 +1,235 @@
+import vendedores.*
+
+
+// Provincias
+const buenosAires = new Provincia(poblacion = 15625084)
+const cordoba = new Provincia(poblacion = 3308876)
+const rioNegro = new Provincia(poblacion = 638645)
+
+// Ciudades
+const sanMartin = new Ciudad(provincia = buenosAires)
+const marDel = new Ciudad(provincia = buenosAires)
+const caba = new Ciudad(provincia = buenosAires)
+const sanMarcos = new Ciudad(provincia = cordoba)
+const laFalda = new Ciudad(provincia = cordoba)
+const bariloche = new Ciudad(provincia = rioNegro)
+
+// Centros
+const lopezYLopez = new CentroDeDistribucion(ciudad = marDel)
+
+// Vendedores
+const rosalia = new VendedorFijo(ciudad = laFalda)
+const rihanna = new VendedorViajante()
+const bizarrap = new ComercioCorresponsal()
+
+// Certificaciones
+const isoCalidad = new Certificacion(puntos = 10, sobreProductos = false)
+const isoProductosAudioVisules = new Certificacion(puntos = 5, sobreProductos = true)
+const isoAmbiente = new Certificacion(puntos = 30, sobreProductos = false)
+
+// Clientes
+const milhaus = new ClienteInseguro()
+const lisa =  new ClienteDetallista()
+const barney =  new ClienteHumanista()
+
+//----------VENDEDORES----------
+
+describe "Vendedor Fijo" {
+
+	test "Puede trabajar en la ciudad asignada" {
+		assert.that(rosalia.puedeTrabajar(laFalda))
+	}
+	
+	test "No puede trabajar en cualquier otra ciudad" {
+		assert.notThat(rosalia.puedeTrabajar(buenosAires))
+	}
+	
+	test "Nunca es influyente" {
+		assert.notThat(rosalia.esInfluyente())
+	}
+}
+
+describe "Vendedor Viajante" {
+	
+	test "Si no está habilitado para ninguna provincia, no puede trabajar en ninguna ciudad" {
+		assert.notThat(rihanna.puedeTrabajar(caba))
+	}
+
+	test "Puede trabajar en ciudades de Buenos Aires" {
+		rihanna.agregarProvincia(buenosAires)
+		assert.that(rihanna.puedeTrabajar(marDel))
+		assert.that(rihanna.puedeTrabajar(caba))
+	}
+
+	test "Puede trabajar solo en ciudades de Cordoba y Misiones" {
+		const misiones = new Provincia(poblacion = 1175000)
+		const posadas = new Ciudad(provincia = misiones)
+		rihanna.agregarProvincia(misiones)
+		rihanna.agregarProvincia(cordoba)
+		assert.that(rihanna.puedeTrabajar(posadas))
+		assert.that(rihanna.puedeTrabajar(laFalda))
+		assert.notThat(rihanna.puedeTrabajar(marDel))
+	}
+
+	test "Puede trabajar en todas las ciudades" {
+		rihanna.agregarProvincia(buenosAires)
+		rihanna.agregarProvincia(cordoba)
+		rihanna.agregarProvincia(rioNegro)
+		assert.that(rihanna.puedeTrabajar(sanMartin))
+		assert.that(rihanna.puedeTrabajar(caba))
+		assert.that(rihanna.puedeTrabajar(marDel))
+		assert.that(rihanna.puedeTrabajar(sanMarcos))
+		assert.that(rihanna.puedeTrabajar(laFalda))
+		assert.that(rihanna.puedeTrabajar(bariloche))
+	}
+
+	test "Es influyente si tiene una provincia con mucha población" {
+		const laPampa = new Provincia(poblacion = 10000000)
+		rihanna.agregarProvincia(laPampa)
+		assert.that(rihanna.esInfluyente())
+	}
+
+	test "No es influyente si no tiene una provincia con poca población" {
+		// "No es influyente si tiene una provincia con poca población"
+		rihanna.agregarProvincia(rioNegro)
+		assert.notThat(rihanna.esInfluyente())
+	}
+
+	test "No es influyente si no tiene ninguna provincia" {
+		assert.notThat(rihanna.esInfluyente())
+	}
+}
+
+describe "Comercio Corresponsal" {
+
+	test "Si no tiene sucursales, no puede trabajar en ninguna ciudad" {
+		assert.notThat(bizarrap.puedeTrabajar(marDel))
+		assert.notThat(bizarrap.puedeTrabajar(caba))
+		assert.notThat(bizarrap.puedeTrabajar(sanMartin))
+		assert.notThat(bizarrap.puedeTrabajar(sanMarcos))
+		assert.notThat(bizarrap.puedeTrabajar(laFalda))
+		assert.notThat(bizarrap.puedeTrabajar(bariloche))
+	}
+
+	test "Puede trabajar en Mardel si tiene sucursal" {
+		bizarrap.agregarSucursal(marDel)
+		assert.that(bizarrap.puedeTrabajar(marDel))
+	}
+
+	test "No puede trabajar en Mardel si no tiene sucursal ahi" {
+		bizarrap.agregarSucursal(caba)
+		assert.notThat(bizarrap.puedeTrabajar(marDel))
+	}
+
+	test "No es influyente con pocas ciudades" {
+		bizarrap.agregarSucursal(caba)
+		bizarrap.agregarSucursal(bariloche)
+		assert.notThat(bizarrap.esInfluyente())
+	}
+
+	test "Es influyente con 5 ciudades en menos de 3 provincias distintas" {
+		bizarrap.agregarSucursal(marDel)
+		bizarrap.agregarSucursal(sanMartin)
+		bizarrap.agregarSucursal(caba)
+		bizarrap.agregarSucursal(laFalda)
+		bizarrap.agregarSucursal(sanMarcos)
+		assert.that(bizarrap.esInfluyente())
+	}
+
+	test "Es influyente con ciudades de 3 provincias distintas" {
+		bizarrap.agregarSucursal(caba)
+		bizarrap.agregarSucursal(laFalda)
+		bizarrap.agregarSucursal(bariloche)
+		assert.that(bizarrap.esInfluyente())
+	}
+}
+
+//----------CENTROS DE DISTRIBUCION----------
+
+describe "Centros de Distribucion" {
+
+	test "Se gregan nuevos vendedores al centro" {
+		assert.equals(lopezYLopez.vendedores(), [])
+		lopezYLopez.agregarVendedor(bizarrap)
+		assert.equals(lopezYLopez.vendedores(), [bizarrap])
+	}
+
+	test "Hay error si el vendedor ya pertenece al centro" {
+		lopezYLopez.agregarVendedor(bizarrap)
+		assert.throwsExceptionWithMessage(
+			"El vendedor ya estaba registrado",
+			{ lopezYLopez.agregarVendedor(bizarrap) }
+		)		
+	}
+
+	test "Vendedor estrella es el de maximo puntaje" {
+		lopezYLopez.agregarVendedor(bizarrap)
+		lopezYLopez.agregarVendedor(rihanna)
+		bizarrap.agregarCertificacion(isoCalidad) // 10 puntos
+		rihanna.agregarCertificacion(isoProductosAudioVisules) // 5 puntos
+		assert.equals(lopezYLopez.vendedorEstrella(), bizarrap)
+	}
+
+	test "Si todos tienen el mismo puntaje, el primer vendedor que encuentre es el estrella" {
+		lopezYLopez.agregarVendedor(bizarrap) // 1°
+		lopezYLopez.agregarVendedor(rihanna) // 2°
+		bizarrap.agregarCertificacion(isoCalidad) // 10 puntos
+		rihanna.agregarCertificacion(isoCalidad) // 10 puntos
+		assert.equals(lopezYLopez.vendedorEstrella(), bizarrap)
+	}
+	
+// Centro Robusto
+	test "Al menos 3 de sus vendedores registrados sea firme." {
+		// "Es robusto si al menos 3 de sus vendedores registrados son firmes"
+		lopezYLopez.agregarVendedor(bizarrap)
+		lopezYLopez.agregarVendedor(rihanna)
+		lopezYLopez.agregarVendedor(rosalia)
+		bizarrap.agregarCertificacion(isoAmbiente) // 30 puntos
+		rosalia.agregarCertificacion(isoAmbiente) // 30 puntos
+		rihanna.agregarCertificacion(isoAmbiente) // 30 puntos
+		assert.that(lopezYLopez.esRobusto())
+	}
+	
+// Colección de _vendedores genéricos_ registrados. 
+	test "Un vendedor se considera genérico si tiene al menos una certificación que no es de productos." {
+		bizarrap.agregarCertificacion(isoCalidad)
+		rihanna.agregarCertificacion(isoCalidad)
+		assert.that(bizarrap.esGenerico())
+		assert.that(rihanna.esGenerico())
+		lopezYLopez.agregarVendedor(bizarrap)
+		lopezYLopez.agregarVendedor(rihanna)
+		assert.equals(lopezYLopez.vendedoresGenericos(), [bizarrap, rihanna])		
+	}
+	
+// Puede cubrir, una ciudad dada
+	test "La condición es que al menos uno de los vendedores registrados pueda trabajar en esa ciudad." {
+		lopezYLopez.agregarVendedor(rosalia)
+		assert.that(lopezYLopez.puedeCubrir(laFalda))
+	}
+
+// completar...
+//-----------REPARTIR CERTIFICACIÓN----------
+	test "Si reparto una certificación que no es de producto, todos los vendedores serán génericos" {
+		lopezYLopez.agregarVendedor(bizarrap)
+		lopezYLopez.agregarVendedor(rihanna)
+		lopezYLopez.repartirCertificacion(isoCalidad)
+		assert.equals(lopezYLopez.vendedoresGenericos(), [bizarrap, rihanna])	
+	}
+	
+//----------AFINIDAD, VENDEDOR CANDIDATO----------
+	test "Si un vendedor (fijo o viajante) puede trabajar en la ciudad donde se encuentra el centro, tiene afinidad con éste" {
+		rihanna.agregarProvincia(buenosAires)
+		assert.that(rihanna.tieneAfinidad(lopezYLopez))
+	}
+	
+	test "Si un vendedor tiene afinidad con un centro y es versatil, es candidato de ese centro" {
+		rihanna.agregarProvincia(buenosAires)
+		rihanna.agregarCertificacion(isoCalidad)
+		rihanna.agregarCertificacion(isoProductosAudioVisules)
+		rihanna.agregarCertificacion(isoAmbiente)
+		assert.that(rihanna.esVersatil())
+		assert.that(lopezYLopez.esCandidato(rihanna))
+	}
+}
+
+

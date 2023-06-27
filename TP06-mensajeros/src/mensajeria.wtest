@@ -1,0 +1,62 @@
+import mensajeria.*
+import mensajeros.*
+
+describe "Test de Mensajeros " {
+
+var destinoPreferido = brooklyn
+
+	method contratarTodos() {
+		mensajeria.contratar(neo)
+		mensajeria.contratar(roberto)
+		mensajeria.contratar(chuck)
+	}
+
+	method destinoPago() {
+		paquete.destino(destinoPreferido)
+	}
+
+	test "la mensajeria no tiene mensajeros"{
+		assert.equals(mensajeria.mensajeros(), [])
+	}
+	
+	test "la mensajeria no tiene a neo"{
+		assert.notThat(mensajeria.mensajeros().contains(neo))
+	}
+	
+	test "La mensajeria tiene a neo como empleado si lo agregarmos" {
+		mensajeria.contratar(neo)
+		assert.that(mensajeria.mensajeros().contains(neo))
+	}
+	
+	test "La mensajeria devuelve a neo y chuck si le pido los cantidatos posibles"{
+		self.contratarTodos()
+		self.destinoPago()
+		assert.equals(mensajeria.mensajeros(), mensajeria.candidatosPara(paquete))
+	}
+	
+	test "La mensajeria tiene Sobrepeso si contrata a todos"{
+		self.contratarTodos()
+		self.destinoPago()
+		assert.that(mensajeria.tieneSobrepeso())
+	}
+	
+	test "No todos los empleados de la mensajeria pueden entregar el paquete"{
+		mensajeria.contratar(neo)
+		mensajeria.contratar(chuck)
+		self.destinoPago()
+		assert.that(mensajeria.paqueteFacil(paquete))
+	}
+	
+	test "La mensajeria tiene sobrepeso si contrata a chuck norris "{
+		mensajeria.contratar(chuck)
+		assert.that(mensajeria.tieneSobrepeso())
+	}
+	
+	test "Si neo es empleado, Hay un mensajero que puede enviar el paquete" {
+		destinoPreferido = matrix
+		mensajeria.contratar(neo)
+		self.destinoPago()
+		assert.that(mensajeria.mensajeros().contains(neo))
+	}
+
+}

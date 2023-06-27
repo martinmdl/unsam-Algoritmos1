@@ -1,0 +1,82 @@
+import naves.*
+
+describe "Nave de carga" {
+
+//	const naveVacia = 
+//	const naveLlena = 
+
+	test "sobrecargada" {
+	
+	}
+
+	test "no sobrecargada" {
+		
+	}
+
+	test "excedida de velocidad" {
+		
+	}
+
+	test "no excedida de velocidad" {
+		
+	}
+
+	test "recibir amenaza" {
+		
+	}
+
+}
+
+describe "Nave de pasajeros" {
+
+//	const naveSinPasajeros = 
+//	const naveConPasajeros =
+
+	test "velocidad maxima sin pasajeros" {
+	
+	}
+
+	test "velocidad maxima con pasajeros" {
+	
+	}
+
+	test "esta en peligro" {
+	
+	}
+
+	test "no esta en peligro" {
+		
+	}
+
+	test "recibir amenaza" {
+		
+	}
+
+}
+
+describe "Nave de combate" {
+
+//	const naveEnReposo =
+//	const naveEnAtaque = 
+
+	test "no esta invisible en reposo" {
+		
+	}
+
+	test "esta invisible en ataque" {
+		
+	}
+
+	test "no esta invisible en ataque" {
+		
+	}
+
+	test "recibir amenaza en reposo" {
+		
+	}
+
+	test "recibir amenaza en ataque" {
+		
+	}
+}
+
